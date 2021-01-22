@@ -14,4 +14,6 @@ require (
 	github.com/temoto/robotstxt v1.1.1 // indirect
 	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb // indirect
 	google.golang.org/appengine v1.6.7 // indirect
+	gorm.io/driver/sqlite v1.1.4
+	gorm.io/gorm v1.20.11
 )

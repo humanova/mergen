@@ -1,8 +1,11 @@
 package post
 
-import "database/sql"
+import (
+	"gorm.io/gorm"
+)
 
 type Post struct {
+	gorm.Model
 	Title 	string
 	Author 	string
 	Text 	string
@@ -11,10 +14,10 @@ type Post struct {
 	Score   int64
 }
 
-var database *sql.DB
+var database *gorm.DB
 
 func InitDb() error {
-	db, err := PrepareDb()
+	db, err := prepareDb()
 	if err != nil {
 		return err
 	}
@@ -22,16 +25,24 @@ func InitDb() error {
 	return nil
 }
 
-func AddPost(newPost Post) error {
-	err := InsertNewPost(database, newPost)
+func Add(newPost Post) error {
+	err := createPost(database, newPost)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func AddPosts(newPosts []Post) error {
-	err := InsertNewPosts(database, newPosts)
+func AddAll(newPosts []Post) error {
+	err := createPosts(database, newPosts)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateScore(post Post, score int64) error {
+	err := updatePostScore(database, post, score)
 	if err != nil {
 		return err
 	}

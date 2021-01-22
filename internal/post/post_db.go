@@ -1,55 +1,61 @@
 package post
 
 import (
-	"database/sql"
 	"fmt"
-	_	"github.com/mattn/go-sqlite3"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	"log"
-	"strings"
 )
 
-func PrepareDb() (*sql.DB, error) {
-	database, err := sql.Open("sqlite3", "./posts.db")
+func prepareDb() (*gorm.DB, error) {
+	database, err := gorm.Open(sqlite.Open("posts.db"), &gorm.Config{})
 	if err != nil {
-		log.Fatal(fmt.Sprintf("[DB] couldn't connect to db : %s", err))
+		log.Print(fmt.Sprintf("[DB] couldn't connect to db : %s", err))
 		return nil, err
 	}
-	statement, err := database.Prepare("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, author TEXT, text TEXT, url TEXT, timestamp DATETIME, score INTEGER)")
+
+	err = database.AutoMigrate(&Post{})
 	if err != nil {
-		log.Fatal(fmt.Sprintf("[DB] couldn't create new table : %s", err))
+		log.Print(fmt.Sprintf("[DB] couldn't create new table : %s", err))
 		return nil, err;
 	}
-	statement.Exec()
 
 	return database, nil
 }
 
-func InsertNewPost(database *sql.DB, post Post) error {
-	statement, err := database.Prepare("INSERT INTO posts (title, author, text, url, timestamp, score) VALUES (?, ?, ?, ?, ?, ?)")
-	if err != nil {
-		log.Fatal(fmt.Sprintf("[DB] couldn't insert new post : %s", err))
-		return err
+func createPost(database *gorm.DB, post Post) error {
+	tx := database.Create(&post)
+	if tx.Error != nil {
+		log.Print(fmt.Sprintf("[DB] couldn't insert new post : %s", tx.Error))
+		return tx.Error
 	}
-	statement.Exec(post.Title, post.Author, post.Text, post.Url, post.Timestamp, post.Score)
 
 	return nil
 }
 
-func InsertNewPosts(database *sql.DB, posts []Post) error {
-	sqlStr := "INSERT INTO posts (title, author, text, url, timestamp, score) VALUES"
-	insertArgs := []interface{}{}
-
-	for _, post := range posts {
-		sqlStr += "(?, ?, ?, ?, ?, ?),"
-		insertArgs = append(insertArgs, post.Title, post.Author, post.Text, post.Url, post.Timestamp, post.Score)
+func createPosts(database *gorm.DB, posts []Post) error {
+	tx := database.Create(&posts)
+	if tx.Error != nil {
+		log.Print(fmt.Sprintf("[DB] couldn't insert new posts : %s", tx.Error))
+		return tx.Error
 	}
-	sqlStr = strings.TrimSuffix(sqlStr, ",")
 
-	statement, err := database.Prepare(sqlStr)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("[DB] couldn't insert new post : %s", err))
-		return err
+	return nil
+}
+
+func updatePostScore(database *gorm.DB, post Post, score int64) error {
+	var p Post
+	tx := database.First(&p, "Url = ?", post.Url)
+	if tx.Error != nil {
+		log.Print(fmt.Sprintf("[DB] couldn't find the post to be updated : %s", tx.Error))
+		return tx.Error
 	}
-	statement.Exec(insertArgs...)
+
+	tx = database.Model(&p).Update("Score", score)
+	if tx.Error != nil {
+		log.Print(fmt.Sprintf("[DB] couldn't update the post : %s", tx.Error))
+		return tx.Error
+	}
+
 	return nil
 }

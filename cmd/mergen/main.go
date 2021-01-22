@@ -12,11 +12,21 @@ func main() {
 		panic(err)
 	}
 
-	// test adding a new post to db
-	p1 := post.Post{"Title", "Author", "blabla", "url_blabla", time.Now().UTC().Unix(), 100}
-	p2 := post.Post{"Title2", "Author2", "blabla2", "url_blabla2", time.Now().UTC().Unix(), 101}
+	// test post functions
+	p1 := post.Post{Title:"Title", Author:"Author", Text:"blabla", Url:"url_blabla", Timestamp:time.Now().UTC().Unix(), Score:100}
+	p2 := post.Post{Title:"Title2", Author:"Author2", Text:"blabla2", Url:"url_blabla2", Timestamp:time.Now().UTC().Unix(), Score:101}
 
-	err = post.AddPosts([]post.Post{p1, p2})
+	err = post.Add(p1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = post.AddAll([]post.Post{p1, p2})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = post.UpdateScore(p2, 420)
 	if err != nil {
 		log.Fatal(err)
 	}
