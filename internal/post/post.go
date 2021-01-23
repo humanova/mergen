@@ -6,12 +6,13 @@ import (
 
 type Post struct {
 	gorm.Model
-	Title 	string
-	Author 	string
-	Text 	string
-	Url 	string
-	Timestamp 	int64 // unix time UTC
-	Score   int64
+	Title     string
+	Source    string
+	Author    string
+	Text      string
+	Url       string
+	Timestamp int64 // unix time UTC
+	Score     int64
 }
 
 var database *gorm.DB
