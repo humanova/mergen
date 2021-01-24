@@ -3,15 +3,12 @@ package post
 import (
 	"fmt"
 	"gorm.io/gorm/clause"
-
-	//"gorm.io/driver/sqlite"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
 )
 
 func prepareDb() (*gorm.DB, error) {
-	//database, err := gorm.Open(sqlite.Open("posts.db"), &gorm.Config{})
 	dsn := "host=localhost user=mergen password=mergen dbname=posts port=5432 sslmode=disable TimeZone=UTC"
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -29,13 +26,11 @@ func prepareDb() (*gorm.DB, error) {
 }
 
 func createPost(database *gorm.DB, post Post) error {
-	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&post)
-	/*
 	tx := database.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "url"}},
 		DoUpdates: clause.AssignmentColumns([]string{"title", "text", "timestamp"}),
 	}).Create(&post)
-	 */
+
 
 	if tx.Error != nil {
 		log.Println(fmt.Sprintf("[DB] couldn't insert new post : %s\n", tx.Error))
@@ -46,13 +41,11 @@ func createPost(database *gorm.DB, post Post) error {
 }
 
 func createPosts(database *gorm.DB, posts []Post) error {
-	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&posts)
-	/*
 	tx := database.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "url"}},
 		DoUpdates: clause.AssignmentColumns([]string{"title", "text", "timestamp"}),
 	}).Create(&posts)
-	*/
+
 	if tx.Error != nil {
 		log.Println(fmt.Sprintf("[DB] couldn't insert new posts : %s\n", tx.Error))
 		return tx.Error
