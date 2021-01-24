@@ -71,16 +71,16 @@ func ScrapeNews() ([]post.Post, error) {
 	}
 
 	var posts []post.Post
-	keys := make(map[string]bool)
+	var keys sync.Map
 
 	fp := gofeed.NewParser()
 	fp.Client = &http.Client{
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
-				Timeout:   5 * time.Second,
-				KeepAlive: 5 * time.Second,
+				Timeout:   10 * time.Second,
+				KeepAlive: 10 * time.Second,
 			}).DialContext,
-			TLSHandshakeTimeout:   2 * time.Second,
+			TLSHandshakeTimeout:   4 * time.Second,
 			ResponseHeaderTimeout: 2 * time.Second,
 			ExpectContinueTimeout: 1 * time.Second,
 			DisableKeepAlives:     true,
@@ -94,9 +94,11 @@ func ScrapeNews() ([]post.Post, error) {
 		log.Printf("[Scraper] Getting feeds : %s\n", website.Name)
 
 		wg.Add(1)
-		go func(website Website, keys *map[string]bool, posts *[]post.Post) {
+		go func(website Website, keys *sync.Map, posts *[]post.Post) {
 			for _, feedUrl := range website.Feeds {
 				feed, err := fp.ParseURL(feedUrl)
+				defer fp.Client.CloseIdleConnections()
+
 				if err != nil {
 					log.Printf("[Scraper] Skipping current '%s' feed : %s", website.Name, err)
 					continue
@@ -104,8 +106,15 @@ func ScrapeNews() ([]post.Post, error) {
 
 				for _, item := range feed.Items {
 					// check if it's a duplicate
-					if _, value := (*keys)[item.Link]; !value {
-						(*keys)[item.Link] = true
+					urlParsed, err := url.Parse(item.Link)
+					if err != nil {
+						log.Printf("[Scraper] Skipping current item of feed '%s' : %s", website.Name, err)
+						continue
+					}
+					itemUrl := urlParsed.Host + urlParsed.Path
+
+					if _, value := keys.Load(itemUrl); !value {
+						keys.Store(itemUrl, true)
 
 						itemAuthor := "None"
 						if item.Author != nil {
@@ -113,12 +122,6 @@ func ScrapeNews() ([]post.Post, error) {
 						}
 						itemTitle := html.UnescapeString(item.Title)
 						itemText := removeHtmlTag(html.UnescapeString(item.Description))
-						urlParsed, err := url.Parse(item.Link)
-						if err != nil {
-							log.Printf("[Scraper] Skipping current '%s' feed : %s", website.Name, err)
-							continue
-						}
-						itemUrl := urlParsed.Host + urlParsed.Path
 
 						p := post.Post{
 							Title:     itemTitle,
