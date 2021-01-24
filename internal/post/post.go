@@ -10,7 +10,7 @@ type Post struct {
 	Source    string
 	Author    string
 	Text      string
-	Url       string
+	Url       string `gorm:"unique"`
 	Timestamp int64 // unix time UTC
 	Score     int64
 }
