@@ -4,14 +4,19 @@ import (
 	"encoding/json"
 	"github.com/mmcdole/gofeed"
 	_ "github.com/mmcdole/gofeed/rss"
+	"html"
 	"io/ioutil"
 	"log"
+	"net"
+	"net/url"
 	"mergen/internal/post"
+	"net/http"
 	"os"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Websites struct {
@@ -67,7 +72,20 @@ func ScrapeNews() ([]post.Post, error) {
 
 	var posts []post.Post
 	keys := make(map[string]bool)
+
 	fp := gofeed.NewParser()
+	fp.Client = &http.Client{
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout:   5 * time.Second,
+				KeepAlive: 5 * time.Second,
+			}).DialContext,
+			TLSHandshakeTimeout:   2 * time.Second,
+			ResponseHeaderTimeout: 2 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			DisableKeepAlives:     true,
+		},
+	}
 
 	// get posts from rss feeds with concurrency
 	wg := sync.WaitGroup{}
@@ -77,8 +95,8 @@ func ScrapeNews() ([]post.Post, error) {
 
 		wg.Add(1)
 		go func(website Website, keys *map[string]bool, posts *[]post.Post) {
-			for _, url := range website.Feeds {
-				feed, err := fp.ParseURL(url)
+			for _, feedUrl := range website.Feeds {
+				feed, err := fp.ParseURL(feedUrl)
 				if err != nil {
 					log.Printf("[Scraper] Skipping current '%s' feed : %s", website.Name, err)
 					continue
@@ -89,16 +107,25 @@ func ScrapeNews() ([]post.Post, error) {
 					if _, value := (*keys)[item.Link]; !value {
 						(*keys)[item.Link] = true
 
-						author := "None"
+						itemAuthor := "None"
 						if item.Author != nil {
-							author = item.Author.Name
+							itemAuthor = item.Author.Name
 						}
+						itemTitle := html.UnescapeString(item.Title)
+						itemText := removeHtmlTag(html.UnescapeString(item.Description))
+						urlParsed, err := url.Parse(item.Link)
+						if err != nil {
+							log.Printf("[Scraper] Skipping current '%s' feed : %s", website.Name, err)
+							continue
+						}
+						itemUrl := urlParsed.Host + urlParsed.Path
+
 						p := post.Post{
-							Title:     item.Title,
+							Title:     itemTitle,
 							Source:    website.Name,
-							Author:    author,
-							Text:      removeHtmlTag(item.Description),
-							Url:       item.Link,
+							Author:    itemAuthor,
+							Text:      itemText,
+							Url:       itemUrl,
 							Timestamp: item.PublishedParsed.Unix(),
 							Score:     0}
 						*posts = append(*posts, p)
