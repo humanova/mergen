@@ -9,12 +9,12 @@ func ScrapeAll() {
 	var eksiPosts []post.Post
 	var newsPosts []post.Post
 
-	newsPosts, err = scrapeNews()
+	newsPosts, err := scrapeNews()
 	if err != nil {
 		log.Printf("[Scraper:main] error in scrapeNews(): %s\n", err)
 	}
 
-	eksiPosts, err := scrapeEksiEntries()
+	eksiPosts, err = scrapeEksiEntries()
 	if err != nil {
 		log.Printf("[Scraper:main] error in scrapeEksiEntries(): %s\n", err)
 	}
