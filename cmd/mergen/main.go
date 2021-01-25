@@ -1,9 +1,13 @@
 package main
 
 import (
+	"github.com/go-co-op/gocron"
 	"log"
 	"mergen/internal/post"
 	"mergen/internal/scraper"
+	"os"
+	"os/signal"
+	"time"
 )
 
 func main() {
@@ -11,17 +15,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	log.Println("Starting scraper cron job...")
 
-	//test scraper funcs
-	var posts []post.Post
-	posts, err = scraper.ScrapeNews()
+	scraperCron := gocron.NewScheduler(time.UTC)
+	_, err = scraperCron.Every(1).Minutes().Do(scraper.ScrapeAll)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("couldn't create cron job : %s", err)
 	}
+	scraperCron.StartAsync()
 
-	err = post.AddAll(posts)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	sig := make(chan os.Signal)
+	signal.Notify(sig, os.Interrupt, os.Kill)
+	<-sig
 }

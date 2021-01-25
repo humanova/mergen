@@ -7,10 +7,10 @@ import (
 	"html"
 	"io/ioutil"
 	"log"
-	"net"
-	"net/url"
 	"mergen/internal/post"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"sort"
@@ -49,7 +49,7 @@ func removeHtmlTag(in string) string {
 func getFeedList(path string) error {
 	feedFile, err := os.Open(path)
 	if err != nil {
-		log.Println("[Scraper] Couldn't open feed list file.")
+		log.Println("[Scraper:news] Couldn't open feed list file.")
 		return err
 	}
 	defer feedFile.Close()
@@ -57,14 +57,14 @@ func getFeedList(path string) error {
 	byteValue, _ := ioutil.ReadAll(feedFile)
 	err = json.Unmarshal(byteValue, &feedList)
 	if err != nil {
-		log.Println("[Scraper] Couldn't unmarshal feed list.")
+		log.Println("[Scraper:news] Couldn't unmarshal feed list.")
 		return err
 	}
 
 	return nil
 }
 
-func ScrapeNews() ([]post.Post, error) {
+func scrapeNews() ([]post.Post, error) {
 	err := getFeedList("rss_list.json")
 	if err != nil {
 		return nil, err
@@ -90,9 +90,8 @@ func ScrapeNews() ([]post.Post, error) {
 	// get posts from rss feeds with concurrency
 	wg := sync.WaitGroup{}
 
+	log.Printf("[Scraper:news] Getting news feeds from %d websites\n", len(feedList.Websites))
 	for _, website := range feedList.Websites {
-		log.Printf("[Scraper] Getting feeds : %s\n", website.Name)
-
 		wg.Add(1)
 		go func(website Website, keys *sync.Map, posts *[]post.Post) {
 			for _, feedUrl := range website.Feeds {
@@ -100,7 +99,7 @@ func ScrapeNews() ([]post.Post, error) {
 				defer fp.Client.CloseIdleConnections()
 
 				if err != nil {
-					log.Printf("[Scraper] Skipping current '%s' feed : %s", website.Name, err)
+					log.Printf("[Scraper:news] Skipping current '%s' feed : %s", website.Name, err)
 					continue
 				}
 
@@ -108,7 +107,7 @@ func ScrapeNews() ([]post.Post, error) {
 					// check if it's a duplicate
 					urlParsed, err := url.Parse(item.Link)
 					if err != nil {
-						log.Printf("[Scraper] Skipping current item of feed '%s' : %s", website.Name, err)
+						log.Printf("[Scraper:news] Skipping current item of feed '%s' : %s", website.Name, err)
 						continue
 					}
 					itemUrl := urlParsed.Host + urlParsed.Path
