@@ -18,7 +18,7 @@ func main() {
 	log.Println("Starting scraper cron job...")
 
 	scraperCron := gocron.NewScheduler(time.UTC)
-	_, err = scraperCron.Every(1).Minutes().Do(scraper.ScrapeAll)
+	_, err = scraperCron.Every(5).Minutes().Do(scraper.ScrapeAll)
 	if err != nil {
 		log.Fatalf("couldn't create cron job : %s", err)
 	}
