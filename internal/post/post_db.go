@@ -5,12 +5,26 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
+	"os"
+	"time"
 )
 
 func prepareDb() (*gorm.DB, error) {
+	dbLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Warn,
+			Colorful:      false,
+		},
+	)
+
 	dsn := "host=localhost user=mergen password=mergen dbname=posts port=5432 sslmode=disable TimeZone=UTC"
-	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: dbLogger,
+	})
 	if err != nil {
 		log.Println(fmt.Sprintf("[DB] couldn't connect to db : %s\n", err))
 		return nil, err
