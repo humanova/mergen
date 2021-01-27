@@ -8,6 +8,7 @@ import (
 func ScrapeAll() {
 	var eksiPosts []post.Post
 	var newsPosts []post.Post
+	var twitterPosts []post.Post
 
 	newsPosts, err := scrapeNews()
 	if err != nil {
@@ -19,10 +20,17 @@ func ScrapeAll() {
 		log.Printf("[Scraper:main] error in scrapeEksiEntries(): %s\n", err)
 	}
 
+	twitterPosts, err = scrapeTwitter()
+	if err != nil {
+		log.Printf("[Scraper:main] error in scrapeTwitter(): %s\n", err)
+	}
+
 	err = post.AddAll(append(newsPosts, eksiPosts...))
 	if err != nil {
 		log.Printf("[Scraper:main] error while inserting posts to db : %s\n", err)
 	}
-	log.Printf("[Scraper:main] Scraped %d from rss feeds, "+
-		"%d from eksisozluk\n------\n", len(newsPosts), len(eksiPosts))
+
+	log.Printf("[Scraper:main] Scraped %d from rss feeds, %d from eksisozluk, " +
+		"%d from twitter\n------\n", len(newsPosts), len(eksiPosts), len(twitterPosts))
+
 }
