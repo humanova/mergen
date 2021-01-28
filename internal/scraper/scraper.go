@@ -25,7 +25,7 @@ func ScrapeAll() {
 		log.Printf("[Scraper:main] error in scrapeTwitter(): %s\n", err)
 	}
 
-	err = post.AddAll(append(newsPosts, eksiPosts...))
+	err = post.AddAll(append(append(newsPosts, eksiPosts...), twitterPosts...))
 	if err != nil {
 		log.Printf("[Scraper:main] error while inserting posts to db : %s\n", err)
 	}

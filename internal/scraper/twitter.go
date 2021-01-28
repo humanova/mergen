@@ -12,7 +12,7 @@ import (
 )
 
 type Accounts struct {
-	accounts []string `json:"accounts"`
+	Accounts []string `json:"accounts"`
 }
 
 var accountList Accounts
@@ -26,6 +26,7 @@ func getAccountList(path string) error {
 	defer accFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(accFile)
+
 	err = json.Unmarshal(byteValue, &accountList)
 	if err != nil {
 		log.Println("[Scraper:twitter] Couldn't unmarshal twitter list.")
@@ -43,10 +44,10 @@ func scrapeTwitter() ([]post.Post, error)  {
 	var posts []post.Post
 
 	scraper := twitterscraper.New()
-	log.Printf("[Scraper:twitter] Getting new tweets from %d twitter accounts\n", len(accountList.accounts))
+	log.Printf("[Scraper:twitter] Getting new tweets from %d twitter accounts\n", len(accountList.Accounts))
 
 	wg := sync.WaitGroup{}
-	for _, username := range accountList.accounts {
+	for _, username := range accountList.Accounts {
 		for tweet := range scraper.GetTweets(context.Background(), username, 50) {
 			wg.Add(1)
 			if tweet.Error != nil {
