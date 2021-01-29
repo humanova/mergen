@@ -87,63 +87,6 @@ func scrapeNews() ([]post.Post, error) {
 	}
 
 	log.Printf("[Scraper:news] Getting news feeds from %d websites\n", len(feedList.Websites))
-	// get posts from rss feeds with concurrency
-	// not used since theres is a data-race issue in gofeeds urlStack
-	/*
-	var keys sync.Map
-
-	wg := sync.WaitGroup{}
-
-	log.Printf("[Scraper:news] Getting news feeds from %d websites\n", len(feedList.Websites))
-	for _, website := range feedList.Websites {
-		wg.Add(1)
-		go func(website Website, keys *sync.Map, posts *[]post.Post) {
-			for _, feedUrl := range website.Feeds {
-				feed, err := fp.ParseURL(feedUrl)
-
-				defer fp.Client.CloseIdleConnections()
-
-				if err != nil {
-					log.Printf("[Scraper:news] Skipping current '%s' feed : %s", website.Name, err)
-					continue
-				}
-
-				for _, item := range feed.Items {
-					// check if it's a duplicate
-					urlParsed, err := url.Parse(item.Link)
-					if err != nil {
-						log.Printf("[Scraper:news] Skipping current item of feed '%s' : %s", website.Name, err)
-						continue
-					}
-					itemUrl := urlParsed.Host + urlParsed.Path
-
-					if _, value := keys.Load(itemUrl); !value {
-						keys.Store(itemUrl, true)
-
-						itemAuthor := "None"
-						if item.Author != nil {
-							itemAuthor = item.Author.Name
-						}
-						itemTitle := html.UnescapeString(item.Title)
-						itemText := removeHtmlTag(html.UnescapeString(item.Description))
-
-						p := post.Post{
-							Title:     itemTitle,
-							Source:    website.Name,
-							Author:    itemAuthor,
-							Text:      itemText,
-							Url:       itemUrl,
-							Timestamp: item.PublishedParsed.Unix(),
-							Score:     0}
-						*posts = append(*posts, p)
-					}
-				}
-			}
-			wg.Done()
-		}(website, &keys, &posts)
-	}
-	wg.Wait()
-	*/
 
 	for _, website := range feedList.Websites {
 		for _, feedUrl := range website.Feeds {
