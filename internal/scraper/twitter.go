@@ -50,22 +50,25 @@ func scrapeTwitter() ([]post.Post, error)  {
 	for _, username := range accountList.Accounts {
 		for tweet := range scraper.GetTweets(context.Background(), username, 50) {
 			wg.Add(1)
-			if tweet.Error != nil {
-				log.Printf("[Scraper:twitter] Couldn't scrape a tweet, skipping : %s", tweet.Error)
-			}
 
-			if !tweet.IsRetweet || tweet.IsQuoted {
-				p := post.Post{
-					Title: tweet.Username + "'s tweet",
-					Source: "Twitter",
-					Author: tweet.Username,
-					Text: tweet.Text,
-					Url: tweet.PermanentURL,
-					Timestamp: tweet.TimeParsed.Unix(),
-					Score: int64(tweet.Retweets*10 + tweet.Likes),
+			go func(tweet *twitterscraper.Result, posts *[]post.Post) {
+				if tweet.Error != nil {
+					log.Printf("[Scraper:twitter] Couldn't scrape a tweet, skipping : %s", tweet.Error)
 				}
-				posts = append(posts, p)
-			}
+
+				if !tweet.IsRetweet || tweet.IsQuoted {
+					p := post.Post{
+						Title:     tweet.Username + "'s tweet",
+						Source:    "Twitter",
+						Author:    tweet.Username,
+						Text:      tweet.Text,
+						Url:       tweet.PermanentURL,
+						Timestamp: tweet.TimeParsed.Unix(),
+						Score:     int64(tweet.Retweets*10 + tweet.Likes),
+					}
+					*posts = append(*posts, p)
+				}
+			}(tweet, &posts)
 		wg.Done()
 		}
 	}
