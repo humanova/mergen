@@ -8,6 +8,7 @@ import (
 	"log"
 	"mergen/internal/post"
 	"os"
+	"sync"
 )
 
 type Subreddits struct {
@@ -60,7 +61,9 @@ func scrapeReddit() ([]post.Post, error) {
 	}
 	var posts []post.Post
 
+	log.Printf("[Scraper:reddit] Getting new posts from %d subreddits accounts\n", len(subList.Subreddits))
 
+	wg := sync.WaitGroup{}
 	for _, subreddit := range subList.Subreddits {
 		harvest, err := bot.Listing(subreddit, "")
 		if err != nil {
@@ -68,19 +71,24 @@ func scrapeReddit() ([]post.Post, error) {
 			return nil, err
 		}
 
-		for _, submission := range harvest.Posts[:20] {
-			p := post.Post{
-				Title:     submission.Title,
-				Source:    fmt.Sprintf("Reddit %s", subreddit),
-				Author:    submission.Author,
-				Text:      submission.SelfText,
-				Url:       submission.Permalink,
-				Timestamp: int64(submission.CreatedUTC),
-				Score:     int64(submission.Score),
+		wg.Add(1)
+		go func(harvest reddit.Harvest, posts *[]post.Post) {
+			for _, submission := range harvest.Posts[:20] {
+				p := post.Post{
+					Title:     submission.Title,
+					Source:    fmt.Sprintf("Reddit %s", subreddit),
+					Author:    submission.Author,
+					Text:      submission.SelfText,
+					Url:       submission.Permalink,
+					Timestamp: int64(submission.CreatedUTC),
+					Score:     int64(submission.Score),
+				}
+				*posts = append(*posts, p)
 			}
-			posts = append(posts, p)
-		}
+			wg.Done()
+		}(harvest, &posts)
 	}
+	wg.Wait()
 
 	return posts, nil
 }
