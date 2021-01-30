@@ -74,16 +74,18 @@ func scrapeReddit() ([]post.Post, error) {
 		wg.Add(1)
 		go func(harvest reddit.Harvest, posts *[]post.Post) {
 			for _, submission := range harvest.Posts[:20] {
-				p := post.Post{
-					Title:     submission.Title,
-					Source:    fmt.Sprintf("Reddit %s", subreddit),
-					Author:    submission.Author,
-					Text:      submission.SelfText,
-					Url:       submission.Permalink,
-					Timestamp: int64(submission.CreatedUTC),
-					Score:     int64(submission.Score),
+				if !submission.Stickied {
+					p := post.Post{
+						Title:     submission.Title,
+						Source:    fmt.Sprintf("Reddit %s", subreddit),
+						Author:    submission.Author,
+						Text:      submission.SelfText,
+						Url:       submission.Permalink,
+						Timestamp: int64(submission.CreatedUTC),
+						Score:     int64(submission.Score),
+					}
+					*posts = append(*posts, p)
 				}
-				*posts = append(*posts, p)
 			}
 			wg.Done()
 		}(harvest, &posts)
