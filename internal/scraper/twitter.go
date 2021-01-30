@@ -68,8 +68,8 @@ func scrapeTwitter() ([]post.Post, error)  {
 					}
 					*posts = append(*posts, p)
 				}
+				wg.Done()
 			}(tweet, &posts)
-		wg.Done()
 		}
 	}
 	wg.Wait()
