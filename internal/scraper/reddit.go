@@ -75,12 +75,17 @@ func scrapeReddit() ([]post.Post, error) {
 		go func(harvest reddit.Harvest, posts *[]post.Post) {
 			for _, submission := range harvest.Posts[:20] {
 				if !submission.Stickied {
+					text := submission.SelfText
+					if !submission.IsSelf {
+						text = submission.URL
+					}
+
 					p := post.Post{
 						Title:     submission.Title,
 						Source:    fmt.Sprintf("Reddit %s", subreddit),
 						Author:    submission.Author,
-						Text:      submission.SelfText,
-						Url:       submission.Permalink,
+						Text:      text,
+						Url:       "https://reddit.com" + submission.Permalink,
 						Timestamp: int64(submission.CreatedUTC),
 						Score:     int64(submission.Score),
 					}
