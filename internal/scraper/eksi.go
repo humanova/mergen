@@ -9,13 +9,6 @@ import (
 	"time"
 )
 
-type TopicEntry struct {
-	Author string
-	Text   string
-	Url    string
-	Score  int64
-}
-
 func scrapeEksiEntries() ([]post.Post, error) {
 	const baseUrl = "https://eksisozluk.com"
 	const timeLayout = "02.01.2006 15:04"
