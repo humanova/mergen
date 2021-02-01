@@ -69,7 +69,7 @@ func scrapeReddit(result chan []post.Post) {
 		harvest, err := bot.Listing(subreddit, "")
 		if err != nil {
 			log.Printf("[Scraper:reddit] Failed to fetch %s : %s", subreddit, err)
-			return
+			continue
 		}
 
 		wg.Add(1)
