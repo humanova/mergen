@@ -62,7 +62,7 @@ func scrapeReddit(result chan []post.Post) {
 	}
 	var posts []post.Post
 
-	log.Printf("[Scraper:reddit] Getting new posts from %d subreddits accounts\n", len(subList.Subreddits))
+	log.Printf("[Scraper:reddit] Getting new posts from %d subreddits\n", len(subList.Subreddits))
 
 	wg := sync.WaitGroup{}
 	for _, subreddit := range subList.Subreddits {
