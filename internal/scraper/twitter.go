@@ -36,10 +36,21 @@ func getAccountList(path string) error {
 	return nil
 }
 
-func scrapeTwitter() ([]post.Post, error)  {
+func initTwitterScraper() error {
 	err := getAccountList("twitter_list.json")
 	if err != nil {
-		return nil, err
+		log.Printf("[Scraper:twitter] Couldn't load account list: %s", err)
+		return err
+	}
+	return nil
+}
+
+func scrapeTwitter(result chan []post.Post) {
+	if accountList.Accounts == nil {
+		err := initTwitterScraper()
+		if err != nil {
+			result <- nil
+		}
 	}
 	var posts []post.Post
 
@@ -53,7 +64,7 @@ func scrapeTwitter() ([]post.Post, error)  {
 
 			go func(tweet *twitterscraper.Result, posts *[]post.Post) {
 				if tweet.Error != nil {
-					log.Printf("[Scraper:twitter] Couldn't scrape a tweet, skipping : %s", tweet.Error)
+					log.Println("[Scraper:twitter] Couldn't scrape a tweet, skipping : ", tweet.Error)
 				}
 
 				if !tweet.IsRetweet || tweet.IsQuoted {
@@ -74,5 +85,5 @@ func scrapeTwitter() ([]post.Post, error)  {
 	}
 	wg.Wait()
 
-	return posts, nil
+	result <- posts
 }

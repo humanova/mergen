@@ -63,12 +63,22 @@ func getFeedList(path string) error {
 	return nil
 }
 
-func scrapeNews() ([]post.Post, error) {
+func initNewsScraper() error {
 	err := getFeedList("rss_list.json")
 	if err != nil {
-		return nil, err
+		log.Println("[Scraper:news] Couldn't load news feed list: ", err)
+		return err
 	}
+	return nil
+}
 
+func scrapeNews(result chan []post.Post) {
+	if feedList.Websites == nil {
+		err := initNewsScraper()
+		if err != nil {
+			result <- nil
+		}
+	}
 	var posts []post.Post
 	keys := make(map[string]bool)
 
@@ -132,5 +142,5 @@ func scrapeNews() ([]post.Post, error) {
 		}
 	}
 
-	return posts, nil
+	result <- posts
 }

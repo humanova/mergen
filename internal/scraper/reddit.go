@@ -37,9 +37,10 @@ func getSubredditList(path string) error {
 	return nil
 }
 
-func initScraper() error {
+func initRedditScraper() error {
 	err := getSubredditList("reddit_list.json")
 	if err != nil {
+		log.Println("[Scraper:reddit] Couldn't load subreddit list: ", err)
 		return err
 	}
 
@@ -52,11 +53,11 @@ func initScraper() error {
 	return nil
 }
 
-func scrapeReddit() ([]post.Post, error) {
+func scrapeReddit(result chan []post.Post) {
 	if bot == nil {
-		err := initScraper()
+		err := initRedditScraper()
 		if err != nil {
-			return nil, err
+			result <- nil
 		}
 	}
 	var posts []post.Post
@@ -68,7 +69,7 @@ func scrapeReddit() ([]post.Post, error) {
 		harvest, err := bot.Listing(subreddit, "")
 		if err != nil {
 			log.Printf("[Scraper:reddit] Failed to fetch %s : %s", subreddit, err)
-			return nil, err
+			return
 		}
 
 		wg.Add(1)
@@ -97,5 +98,5 @@ func scrapeReddit() ([]post.Post, error) {
 	}
 	wg.Wait()
 
-	return posts, nil
+	result <- posts
 }
