@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{template "head"}}
+</head>
+<body>
+<br>
+<div class="row">
+    <div class="col-md-2">
+    </div>
+    <div class="col-md-8">
+        <h1 style="text-align:center">mergen</h1>
+        <br>
+        <h2>Posts</h2>
+        <table id="posts-table" style="table-layout: fixed;" class="table table-hover d-inline-block text-truncate">
+            <thead>
+            <tr>
+                <th>Source</th>
+                <th>Date</th>
+                <th>Title</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .}}
+                <tr style="cursor: pointer;" onclick="redir_post({{.Url}})">
+                    <td>{{.Source}}</td>
+                    <td class="timestamp_row">{{.Timestamp}}</td>
+                    <td>{{.Title}}</td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <div class="col-md-2"></div>
+</div>
+{{template "scripts"}}
+</body>
+{{template "footer"}}
+</html>
