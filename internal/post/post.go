@@ -41,7 +41,14 @@ func AddAll(newPosts []Post) error {
 	}
 	return nil
 }
-
+func GetPosts(timestamp int64) ([]Post, error) {
+	var posts []Post
+	posts, err := getPostsSince(database, timestamp)
+	if err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
 func UpdateScore(post Post, score int64) error {
 	err := updatePostScore(database, post, score)
 	if err != nil {

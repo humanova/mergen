@@ -69,18 +69,23 @@ func createPosts(database *gorm.DB, posts []Post) error {
 }
 
 func updatePostScore(database *gorm.DB, post Post, score int64) error {
-	var p Post
-	tx := database.First(&p, "url = ?", post.Url)
-	if tx.Error != nil {
-		log.Println(fmt.Sprintf("[DB] couldn't find the post to be updated : %s\n", tx.Error))
-		return tx.Error
-	}
-
-	tx = database.Model(&p).Update("Score", score)
+	tx := database.Update("Score", score).Where("url = ?", post.Url)
 	if tx.Error != nil {
 		log.Println(fmt.Sprintf("[DB] couldn't update the post : %s\n", tx.Error))
 		return tx.Error
 	}
 
 	return nil
+}
+
+func getPostsSince(database *gorm.DB, timestamp int64) ([]Post, error) {
+	var posts []Post
+
+	tx := database.Where("timestamp > ?", timestamp).Find(&posts)
+	if tx.Error != nil {
+		log.Println(fmt.Sprintf("[DB] couldn't query any posts with given timestamp(%d) : %s\n", timestamp, tx.Error))
+		return nil, tx.Error
+	}
+
+	return posts, nil
 }
