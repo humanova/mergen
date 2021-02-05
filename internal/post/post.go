@@ -42,9 +42,18 @@ func AddAll(newPosts []Post) error {
 	return nil
 }
 
-func GetPosts(timestamp int64) ([]Post, error) {
+func GetPostsSince(timestamp int64) ([]Post, error) {
 	var posts []Post
 	posts, err := getPostsSince(database, timestamp)
+	if err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
+
+func GetPostsFiltered(filters Filters) ([]Post, error) {
+	var posts []Post
+	posts, err := getPostsFiltered(database, filters)
 	if err != nil {
 		return nil, err
 	}

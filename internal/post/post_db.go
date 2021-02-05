@@ -2,14 +2,22 @@ package post
 
 import (
 	"fmt"
-	"gorm.io/gorm/clause"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 	"log"
 	"os"
 	"time"
 )
+
+type Filters struct {
+	CreatedAfter  string
+	CreatedBefore string
+	QueryText     string
+	Sources       []string
+	Author        string
+}
 
 func prepareDb() (*gorm.DB, error) {
 	dbLogger := logger.New(
@@ -44,7 +52,6 @@ func createPost(database *gorm.DB, post Post) error {
 		Columns:   []clause.Column{{Name: "url"}},
 		DoUpdates: clause.AssignmentColumns([]string{"title", "text", "timestamp"}),
 	}).Create(&post)
-
 
 	if tx.Error != nil {
 		log.Println(fmt.Sprintf("[DB] couldn't insert new post : %s\n", tx.Error))
@@ -84,6 +91,44 @@ func getPostsSince(database *gorm.DB, timestamp int64) ([]Post, error) {
 	tx := database.Where("timestamp > ?", timestamp).Find(&posts)
 	if tx.Error != nil {
 		log.Println(fmt.Sprintf("[DB] couldn't query any posts with given timestamp(%d) : %s\n", timestamp, tx.Error))
+		return nil, tx.Error
+	}
+
+	return posts, nil
+}
+
+func getPostsFiltered(database *gorm.DB, filters Filters) ([]Post, error) {
+	var posts []Post
+
+	tx := database.Where("")
+	if filters.CreatedAfter != "" {
+		tx.Where("timestamp > ?", filters.CreatedAfter)
+	}
+	if filters.CreatedBefore != "" {
+		tx = tx.Where("timestamp < ?", filters.CreatedBefore)
+	}
+	if filters.Author != "" {
+		tx = tx.Where("author LIKE ?", fmt.Sprintf("%%%s%%", filters.Author))
+	}
+	if filters.QueryText != "" {
+		tx = tx.Where("text LIKE ? OR title LIKE ?",
+			fmt.Sprintf("%%%s%%", filters.QueryText),
+			fmt.Sprintf("%%%s%%", filters.QueryText))
+	}
+	if filters.Sources != nil {
+		tx = tx.Where("source IN ?", filters.Sources)
+	}
+
+	// if nothing is passed as a filter, return posts from last 12 hours
+	if filters.CreatedAfter == "" && filters.CreatedBefore == "" &&
+		filters.Author == "" && filters.QueryText == "" && filters.Sources == nil {
+		tx = tx.Where("timestamp > ?", (time.Now().Add(-12 * time.Hour)).UTC().Unix())
+	}
+
+	tx.Find(&posts)
+
+	if tx.Error != nil {
+		log.Println(fmt.Sprintf("[DB] couldn't query any posts with given filters(%v) : %s\n", filters, tx.Error))
 		return nil, tx.Error
 	}
 
