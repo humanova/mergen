@@ -1,19 +1,22 @@
 {{define "scripts"}}
     <script>
-        function redir_post(url) {
-            var prefix = "";
-            if (!url.startsWith("http")) {
-                prefix = "https://";
-            }
-            window.location.href = prefix + url;
-        };
-
         document.addEventListener("DOMContentLoaded", function(){
+            // make timestamps human readable
             rows = document.getElementsByClassName("timestamp_row");
             var now = Math.round(new Date().getTime()/1000);
 
             for (var i=0; i < rows.length; i++) {
                 rows[i].innerHTML = timeDifferenceStr(now, parseInt(rows[i].innerHTML));
+            }
+
+            // fix hrefs
+            var elements = document.querySelectorAll("a[href]");
+
+            for (var i=0; i < elements.length; i++) {
+                curr_href = elements[i].getAttribute("href");
+                if (!curr_href.startsWith("http")) {
+                    elements[i].setAttribute("href", "http://"+curr_href);
+                }
             }
         });
 
