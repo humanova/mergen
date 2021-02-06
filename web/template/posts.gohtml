@@ -23,9 +23,11 @@
             <tbody>
             {{range .}}
                 <tr>
-                    <td style="cursor: pointer;"onclick="redir_post({{.Url}})">
-                        <span style="float:left"> <i class="fas fa-external-link-alt fa-xs"></i> &nbsp</span>
-                        {{.Source}}
+                    <td style="cursor: pointer;">
+                        <a href="{{.Url}}">
+                            <span style="float:left"> <i class="fas fa-external-link-alt fa-xs"></i> &nbsp</span>
+                            {{.Source}}
+                        </a>
                     </td>
                     <td class="timestamp_row">{{.Timestamp}}</td>
                     <td style="cursor: pointer;" data-toggle="modal" data-target="#modal_{{.Url}}" class="clickable">{{.Title}}</td>
