@@ -108,10 +108,10 @@ func getPostsFiltered(database *gorm.DB, filters Filters) ([]Post, error) {
 		tx = tx.Where("timestamp < ?", filters.CreatedBefore)
 	}
 	if filters.Author != "" {
-		tx = tx.Where("author LIKE ?", fmt.Sprintf("%%%s%%", filters.Author))
+		tx = tx.Where("author ILIKE ?", fmt.Sprintf("%%%s%%", filters.Author))
 	}
 	if filters.QueryText != "" {
-		tx = tx.Where("text LIKE ? OR title LIKE ?",
+		tx = tx.Where("text ILIKE ? OR title ILIKE ?",
 			fmt.Sprintf("%%%s%%", filters.QueryText),
 			fmt.Sprintf("%%%s%%", filters.QueryText))
 	}
