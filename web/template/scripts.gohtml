@@ -1,21 +1,30 @@
 {{define "scripts"}}
     <script>
+        // init datetimepicker
+        $('#datetimepicker-after').datetimepicker({
+            format: 'yyyy-mm-dd hh:ii'
+        });
+        $('#datetimepicker-before').datetimepicker({
+            format: 'yyyy-mm-dd hh:ii'
+        });
+    </script>
+    <script>
         document.addEventListener("DOMContentLoaded", function(){
             // make timestamps human readable
             rows = document.getElementsByClassName("timestamp_row");
             var now = Math.round(new Date().getTime()/1000);
 
-            for (var i=0; i < rows.length; i++) {
-                rows[i].innerHTML = timeDifferenceStr(now, parseInt(rows[i].innerHTML));
+            for (var row of rows) {
+                row.innerHTML = timeDifferenceStr(now, parseInt(row.innerHTML));
             }
 
             // fix hrefs
             var elements = document.querySelectorAll("a[href]");
 
-            for (var i=0; i < elements.length; i++) {
-                curr_href = elements[i].getAttribute("href");
+            for (var element of elements) {
+                curr_href = element.getAttribute("href");
                 if (!curr_href.startsWith("http")) {
-                    elements[i].setAttribute("href", "http://"+curr_href);
+                    element.setAttribute("href", "http://"+curr_href);
                 }
             }
         });
