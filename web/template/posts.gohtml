@@ -10,6 +10,32 @@
     </div>
     <div style="margin-left: auto;margin-right: auto" class="col-md-8">
         <h1 style="text-align:center">mergen</h1>
+        <div id="filters-section">
+            <div>
+                <button type="filters-button" class="btn btn-dark btn-lg" data-toggle="collapse"
+                        data-target="#filters">Filters</button>
+            </div>
+            <div class="collapsing" id="filters">
+                <form>
+                    <div style="margin: 6%" class="form-group">
+                        <h3 style="margin: 2%;text-align:center">Post Filters</h3>
+                        <input autocomplete="off" type="text" class="form-control" name="search-filter" id="search-filter"
+                               placeholder="search query" required>
+                        <span>
+                            <input type="text" id="datetimepicker-after">
+                            <p> to </p>
+                            <input type="text" id="datetimepicker-before">
+                        </span>
+                        <input autocomplete="off" type="text" class="form-control" name="source-filter" id="source-filter"
+                               placeholder="source" required>
+                        <br>
+                    </div>
+                </form>
+                <div class="form-group">
+                    <input class="btn btn-primary btn-lg float-right" id="gen-button" type="submit" value="Search">
+                </div>
+            </div>
+        </div>
         <br>
         <h2>Posts</h2>
         <table id="posts-table" style="table-layout: fixed;" class="table table-hover d-inline-block text-truncate">

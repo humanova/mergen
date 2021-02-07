@@ -1,0 +1,18 @@
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #f1f1f1;
+        background: #121212;
+    }
+
+    a {
+        color: #228fd9;
+    }
+
+    table {
+        border-color:#6d6d6d;
+    }
+
+    .modal-content {
+        background-color: #121212;
+    }
+}
