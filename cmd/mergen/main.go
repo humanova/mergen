@@ -27,6 +27,7 @@ func main() {
 
 	r := mux.NewRouter()
 	router := r.PathPrefix("/mergen").Subrouter()
+	router.HandleFunc("/web", handler.WebHandler).Methods("GET")
 	router.HandleFunc("/posts", handler.PostsHandler).Methods("GET")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/mergen/static/", http.FileServer(http.Dir("./web/static/"))))
 
