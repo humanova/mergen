@@ -24,6 +24,7 @@ type Websites struct {
 
 type Website struct {
 	Name  string   `json:"name"`
+	Lang  string   `json:"lang"`
 	Feeds []string `json:"feeds"`
 }
 
@@ -135,7 +136,8 @@ func scrapeNews(result chan []post.Post) {
 						Text:      itemText,
 						Url:       itemUrl,
 						Timestamp: item.PublishedParsed.Unix(),
-						Score:     0}
+						Score:     0,
+						Language:  website.Lang}
 					posts = append(posts, p)
 				}
 			}

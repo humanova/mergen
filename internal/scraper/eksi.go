@@ -74,6 +74,7 @@ func scrapeEksiEntries(result chan []post.Post) {
 			Url:       url,
 			Timestamp: entryTime.Unix(),
 			Score:     score,
+			Language:  "tr",
 		}
 
 		posts = append(posts, p)

@@ -12,9 +12,13 @@ import (
 )
 
 type Accounts struct {
-	Accounts []string `json:"accounts"`
+	Accounts []Account `json:"accounts"`
 }
 
+type Account struct {
+	Name  string   `json:"name"`
+	Lang  string   `json:"lang"`
+}
 var accountList Accounts
 
 func getAccountList(path string) error {
@@ -58,8 +62,8 @@ func scrapeTwitter(result chan []post.Post) {
 	log.Printf("[Scraper:twitter] Getting new tweets from %d twitter accounts\n", len(accountList.Accounts))
 
 	wg := sync.WaitGroup{}
-	for _, username := range accountList.Accounts {
-		for tweet := range scraper.GetTweets(context.Background(), username, 50) {
+	for _, acc := range accountList.Accounts {
+		for tweet := range scraper.GetTweets(context.Background(), acc.Name, 50) {
 			wg.Add(1)
 
 			go func(tweet *twitterscraper.Result, posts *[]post.Post) {
@@ -76,6 +80,7 @@ func scrapeTwitter(result chan []post.Post) {
 						Url:       tweet.PermanentURL,
 						Timestamp: tweet.TimeParsed.Unix(),
 						Score:     int64(tweet.Retweets*10 + tweet.Likes),
+						Language:  acc.Lang,
 					}
 					*posts = append(*posts, p)
 				}

@@ -13,6 +13,7 @@ type Post struct {
 	Url       string `gorm:"unique"`
 	Timestamp int64 // unix time UTC
 	Score     int64
+	Language string
 }
 
 var database *gorm.DB
