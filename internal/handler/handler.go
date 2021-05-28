@@ -13,16 +13,17 @@ var tpl *template.Template
 
 func getPosts(r *http.Request) ([]post.Post, error) {
 	var posts []post.Post
-	var sources []string
+	var sources, languages []string
 	query := r.URL.Query()
 
 	created_after := query.Get("created_after")
 	created_before := query.Get("created_before")
 	query_text := query.Get("query")
 	sources = query["source"]  // can be an array
+	languages = query["language"]
 	author := query.Get("author")
 
-	filters := post.Filters{created_after, created_before, query_text, sources, author}
+	filters := post.Filters{created_after, created_before, query_text, sources, languages, author}
 	posts, err := post.GetPostsFiltered(filters)
 	if err != nil {
 		return nil, err

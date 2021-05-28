@@ -16,6 +16,7 @@ type Filters struct {
 	CreatedBefore string
 	QueryText     string
 	Sources       []string
+	Languages     []string
 	Author        string
 }
 
@@ -117,6 +118,9 @@ func getPostsFiltered(database *gorm.DB, filters Filters) ([]Post, error) {
 	}
 	if filters.Sources != nil {
 		tx = tx.Where("source IN ?", filters.Sources)
+	}
+	if filters.Languages != nil {
+		tx = tx.Where("language IN ?", filters.Languages)
 	}
 
 	// if nothing is passed as a filter, return posts from last 12 hours
