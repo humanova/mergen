@@ -89,7 +89,7 @@ func scrapeReddit(result chan []post.Post) {
 						Url:       "https://reddit.com" + submission.Permalink,
 						Timestamp: int64(submission.CreatedUTC),
 						Score:     int64(submission.Score),
-						Language:  "eng",
+						Language:  "en",
 					}
 					*posts = append(*posts, p)
 				}
