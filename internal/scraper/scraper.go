@@ -27,9 +27,17 @@ func ScrapeAll() {
 		posts = append(posts, postCollection...)
 	}
 
-	err := post.AddAll(posts)
-	if err != nil {
-		log.Printf("[Scraper:main] error while inserting posts to db : %s\n", err)
+	// insert posts in batches of 250
+	batch := 250
+	for i:=0; i < len(posts); i+= batch {
+		j := i + batch
+		if j > len(posts) {
+			j = len(posts)
+		}
+		err := post.AddAll(posts[i:j])
+		if err != nil {
+			log.Printf("[Scraper:main] error while inserting posts to db : %s\n", err)
+		}
 	}
 
 	log.Printf("[Scraper:main] Scraped %d from rss feeds, %d from eksisozluk, %d from twitter, " +
