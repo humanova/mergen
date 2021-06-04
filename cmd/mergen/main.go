@@ -16,6 +16,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	err = post.InitRedis()
+	if err != nil {
+		log.Println("couldn't connect to the redis server")
+	}
+
 	log.Println("Starting scraper cron job...")
 
 	scraperCron := gocron.NewScheduler(time.UTC)
