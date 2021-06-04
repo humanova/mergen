@@ -34,7 +34,7 @@ func InitDb() error {
 }
 
 func InitRedis() error {
-	redisClient := redis.NewClient(&redis.Options{
+	redisClient = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		DB:       0,
 	})
