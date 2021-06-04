@@ -60,7 +60,7 @@ func Add(newPost Post) error {
 	}
 
 	// publish to redis pub/sub
-	if (redisClient != nil) {
+	if redisClient != nil {
 		newPostJson, err := json.Marshal(newPost)
 		if err != nil {
 			return err
@@ -82,7 +82,7 @@ func AddAll(newPosts []Post) error {
 	}
 
 	// publish to redis pub/sub
-	if (redisClient != nil) {
+	if redisClient != nil {
 		newPostsJson, err := json.Marshal(newPosts)
 		if err != nil {
 			return err
