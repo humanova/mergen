@@ -8,7 +8,7 @@
   "DbSSLMode" : "disable",
   "RedisHost" : "localhost:6379",
   "RedisDB" : 0,
-  "RedditConfigPath" : "configs/mergenbot.agent",
+  "RedditConfigPath" : "configs/redditbot.agent",
   "RSSListPath" : "configs/rss_list.json",
   "RedditListPath" : "configs/reddit_list.json",
   "TwitterListPath" : "configs/twitter_list.json"
