@@ -6,6 +6,7 @@ import (
 	"github.com/turnage/graw/reddit"
 	"io/ioutil"
 	"log"
+	"mergen/internal/config"
 	"mergen/internal/post"
 	"os"
 	"sync"
@@ -38,13 +39,13 @@ func getSubredditList(path string) error {
 }
 
 func initRedditScraper() error {
-	err := getSubredditList("reddit_list.json")
+	err := getSubredditList(config.Config.RedditListPath)
 	if err != nil {
 		log.Println("[Scraper:reddit] Couldn't load subreddit list: ", err)
 		return err
 	}
 
-	bot, err = reddit.NewBotFromAgentFile("mergenbot.agent", 0)
+	bot, err = reddit.NewBotFromAgentFile(config.Config.RedditConfigPath, 0)
 	if err != nil {
 		log.Println("[Scraper:reddit] Failed to create bot handle: ", err)
 		return err

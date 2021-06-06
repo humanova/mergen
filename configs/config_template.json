@@ -1,0 +1,15 @@
+{
+  "ScrapeInterval" : 5,
+  "DbName" : "posts",
+  "DbHost" : "localhost",
+  "DbPort" : 5432,
+  "DbUser" : "user",
+  "DbPassword" : "password",
+  "DbSSLMode" : "disable",
+  "RedisHost" : "localhost:6379",
+  "RedisDB" : 0,
+  "RedditConfigPath" : "configs/mergenbot.agent",
+  "RSSListPath" : "configs/rss_list.json",
+  "RedditListPath" : "configs/reddit_list.json",
+  "TwitterListPath" : "configs/twitter_list.json"
+}

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
+	"mergen/internal/config"
 	"time"
 )
 
@@ -36,8 +37,8 @@ func InitDb() error {
 
 func InitRedis() error {
 	redisClient = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		DB:       0,
+		Addr:     config.Config.RedisHost,
+		DB:       config.Config.RedisDB,
 	})
 	// ping the redis server
 	err := redisClient.Ping(context.Background()).Err()
@@ -58,8 +59,8 @@ func PublishNewPosts() (int, error) {
 	if redisClient == nil {
 		return 0, errors.New("redis client is not initialized")
 	}
-	// TODO: change 5 to config.scrapeInterval after implementing the config
-	newPosts, err := getPostsUpdatedAfter(database, time.Now().Add(time.Duration(-5) * time.Minute))
+
+	newPosts, err := getPostsUpdatedAfter(database, time.Now().Add(time.Duration(config.Config.ScrapeInterval) * time.Minute))
 	if err != nil {
 		return 0, err
 	}

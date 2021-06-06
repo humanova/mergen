@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 	"log"
+	"mergen/internal/config"
 	"os"
 	"time"
 )
@@ -30,7 +31,10 @@ func prepareDb() (*gorm.DB, error) {
 		},
 	)
 
-	dsn := "host=localhost user=mergen password=mergen dbname=posts port=5432 sslmode=disable TimeZone=UTC"
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=UTC",
+		   config.Config.DbHost, config.Config.DbUser, config.Config.DbPassword, config.Config.DbName,
+		   config.Config.DbPort, config.Config.DbSSLMode)
+
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: dbLogger,
 	})

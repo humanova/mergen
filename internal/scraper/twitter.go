@@ -6,6 +6,7 @@ import (
 	twitterscraper "github.com/n0madic/twitter-scraper"
 	"io/ioutil"
 	"log"
+	"mergen/internal/config"
 	"mergen/internal/post"
 	"os"
 	"sync"
@@ -41,7 +42,7 @@ func getAccountList(path string) error {
 }
 
 func initTwitterScraper() error {
-	err := getAccountList("twitter_list.json")
+	err := getAccountList(config.Config.TwitterListPath)
 	if err != nil {
 		log.Printf("[Scraper:twitter] Couldn't load account list: %s", err)
 		return err

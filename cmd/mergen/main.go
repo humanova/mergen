@@ -4,6 +4,7 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/gorilla/mux"
 	"log"
+	"mergen/internal/config"
 	"mergen/internal/handler"
 	"mergen/internal/post"
 	"mergen/internal/scraper"
@@ -14,17 +15,18 @@ import (
 func main() {
 	err := post.InitDb()
 	if err != nil {
-		panic(err)
+		log.Panicf("couldn't connect to the database : %v", err)
 	}
+
 	err = post.InitRedis()
 	if err != nil {
 		log.Println("couldn't connect to the redis server")
 	}
 
 	log.Println("Starting scraper cron job...")
-
 	scraperCron := gocron.NewScheduler(time.UTC)
-	_, err = scraperCron.Every(5).Minutes().Do(scraper.ScrapeAll)
+
+	_, err = scraperCron.Every(config.Config.ScrapeInterval).Minutes().Do(scraper.ScrapeAll)
 	if err != nil {
 		log.Fatalf("couldn't create cron job : %s", err)
 	}

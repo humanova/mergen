@@ -7,6 +7,7 @@ import (
 	"html"
 	"io/ioutil"
 	"log"
+	"mergen/internal/config"
 	"mergen/internal/post"
 	"net"
 	"net/http"
@@ -65,7 +66,7 @@ func getFeedList(path string) error {
 }
 
 func initNewsScraper() error {
-	err := getFeedList("rss_list.json")
+	err := getFeedList(config.Config.RSSListPath)
 	if err != nil {
 		log.Println("[Scraper:news] Couldn't load news feed list: ", err)
 		return err
