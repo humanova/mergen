@@ -44,6 +44,7 @@ func InitRedis() error {
 		time.Sleep(3*time.Second)
 		err := redisClient.Ping(context.Background()).Err()
 		if err != nil {
+			redisClient = nil
 			return err
 		}
 	}
