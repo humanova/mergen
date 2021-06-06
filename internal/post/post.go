@@ -3,6 +3,7 @@ package post
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 	"time"
@@ -53,23 +54,35 @@ func InitRedis() error {
 	return nil
 }
 
+func PublishNewPosts() (int, error) {
+	if redisClient == nil {
+		return 0, errors.New("redis client is not initialized")
+	}
+	// TODO: change 5 to config.scrapeInterval after implementing the config
+	newPosts, err := getPostsUpdatedAfter(database, time.Now().Add(time.Duration(-5) * time.Minute))
+	if err != nil {
+		return 0, err
+	}
+	// publish to redis pub/sub
+	if redisClient != nil {
+		newPostsJson, err := json.Marshal(newPosts)
+		if err != nil {
+			return 0, err
+		}
+		err = redisClient.Publish(ctx, "new_posts", newPostsJson).Err()
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return len(newPosts), nil
+}
+
 func Add(newPost Post) error {
 	// insert to db
 	err := createPost(database, newPost)
 	if err != nil {
 		return err
-	}
-
-	// publish to redis pub/sub
-	if redisClient != nil {
-		newPostJson, err := json.Marshal(newPost)
-		if err != nil {
-			return err
-		}
-		err = redisClient.Publish(ctx, "new_posts", newPostJson).Err()
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -81,24 +94,12 @@ func AddAll(newPosts []Post) error {
 	if err != nil {
 		return err
 	}
-
-	// publish to redis pub/sub
-	if redisClient != nil {
-		newPostsJson, err := json.Marshal(newPosts)
-		if err != nil {
-			return err
-		}
-		err = redisClient.Publish(ctx, "new_posts", newPostsJson).Err()
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
 func GetPostsSince(timestamp int64) ([]Post, error) {
 	var posts []Post
-	posts, err := getPostsSince(database, timestamp)
+	posts, err := getPostsPublishedAfter(database, timestamp)
 	if err != nil {
 		return nil, err
 	}

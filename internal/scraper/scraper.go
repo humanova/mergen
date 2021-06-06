@@ -39,7 +39,13 @@ func ScrapeAll() {
 			log.Printf("[Scraper:main] error while inserting posts to db : %s\n", err)
 		}
 	}
+	// publish newly added/updated posts to 'new_posts' pub/sub channel
+	publishedCount, err := post.PublishNewPosts()
+	if err != nil {
+		log.Printf("[Scraper:main] error while publishing posts to redis channel : %s\n", err)
+	}
 
+	log.Printf("[Scraper:main] Published %d posts to redis channel\n", publishedCount)
 	log.Printf("[Scraper:main] Scraped %d from rss feeds, %d from eksisozluk, %d from twitter, " +
 	"%d from reddit\n------\n", len(newsPosts), len(eksiPosts), len(twitterPosts), len(redditPosts))
 }

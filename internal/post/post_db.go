@@ -86,12 +86,24 @@ func updatePostScore(database *gorm.DB, post Post, score int64) error {
 	return nil
 }
 
-func getPostsSince(database *gorm.DB, timestamp int64) ([]Post, error) {
+func getPostsPublishedAfter(database *gorm.DB, timestamp int64) ([]Post, error) {
 	var posts []Post
 
 	tx := database.Where("timestamp > ?", timestamp).Find(&posts)
 	if tx.Error != nil {
 		log.Println(fmt.Sprintf("[DB] couldn't query any posts with given timestamp(%d) : %s\n", timestamp, tx.Error))
+		return nil, tx.Error
+	}
+
+	return posts, nil
+}
+
+func getPostsUpdatedAfter(database *gorm.DB, qTime time.Time) ([]Post, error) {
+	var posts []Post
+
+	tx := database.Where("updated_at > ?", qTime).Find(&posts)
+	if tx.Error != nil {
+		log.Println(fmt.Sprintf("[DB] couldn't query any posts with given time(%d) : %s\n", qTime, tx.Error))
 		return nil, tx.Error
 	}
 
