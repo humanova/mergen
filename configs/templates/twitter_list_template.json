@@ -1,0 +1,16 @@
+{
+  "accounts" : [
+    {
+      "name": "humanova",
+      "lang": ""
+    },
+    {
+      "name": "jack",
+      "lang": "en"
+    },
+    {
+      "name": "someone",
+      "lang": "tr"
+    }
+  ]
+}

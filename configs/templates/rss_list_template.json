@@ -1,0 +1,27 @@
+{
+  "websites" : [
+    {
+      "name": "The Wall Street Journal",
+      "lang": "en",
+      "feeds" : [
+        "https://feeds.a.dj.com/rss/RSSWorldNews.xml"
+      ]
+    },
+    {
+      "name": "The Washington Post",
+      "lang": "en",
+      "feeds" : [
+        "http://feeds.washingtonpost.com/rss/rss_powerpost?itid=lk_inline_manual_4",
+        "http://feeds.washingtonpost.com/rss/world?itid=lk_inline_manual_43"
+      ]
+    },
+    {
+      "name": "The New York Times",
+      "lang": "en",
+      "feeds" : [
+        "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+        "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+      ]
+    }
+  ]
+}

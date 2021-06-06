@@ -1,0 +1,5 @@
+user_agent: "Mergen"
+client_id: "agent_client_id"
+client_secret: "agent_client_secret"
+username: "username"
+password: "password"
