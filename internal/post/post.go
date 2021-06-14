@@ -60,7 +60,7 @@ func PublishNewPosts() (int, error) {
 		return 0, errors.New("redis client is not initialized")
 	}
 
-	newPosts, err := getPostsUpdatedAfter(database, time.Now().UTC().Add(time.Duration(config.Config.ScrapeInterval) * time.Minute))
+	newPosts, err := getPostsUpdatedAfter(database, time.Now().UTC().Add(time.Duration(-config.Config.ScrapeInterval) * time.Minute))
 	if err != nil {
 		return 0, err
 	}
