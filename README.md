@@ -6,6 +6,9 @@ mergen can gather news data from RSS feeds, Twitter accounts (using the unoffici
 
 Redis pub/sub is used for passing new posts to [bilge](https://github.com/humanova/bilge), my NLP analysis service. 
 
+![metabase dashboard 1](media/metabase_dashboard_1.png) ![metabase dashboard 1](media/metabase_dashboard_2.png)
+Sample visualizations of the news I scraped between January-November 2021, on my Metabase dashboard. 
+
 ## Configuration
 
 ### Sample main config (configs/config.json)
