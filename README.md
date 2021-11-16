@@ -2,9 +2,9 @@
 
 Considerably fast news/social media scraper written in Go, using its concurrency features. Part of a project focused mainly on Data Mining using NLP. 
 
-mergen can gather news data from RSS feeds, Twitter accounts (using the unofficial API), Subreddits, and Eksisozluk posts (a turkish forum-like website). Utilizing PostgreSQL and Redis pub/sub (optional). 
+mergen can gather news data from RSS feeds, Twitter accounts (using the unofficial API), Subreddits, and Eksisozluk posts (a Turkish forum-like website). Utilizing PostgreSQL and Redis pub/sub channels (optional). 
 
-Pub/sub channel is used for passing new posts to [bilge](https://github.com/humanova/bilge), my NLP analysis service. 
+Redis pub/sub is used for passing new posts to [bilge](https://github.com/humanova/bilge), my NLP analysis service. 
 
 ## Configuration
 
