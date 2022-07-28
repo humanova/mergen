@@ -20,7 +20,7 @@ func scrapeEksiEntries(result chan []post.Post) {
 
 	// parse popular topics
 	c.OnHTML("ul[class]", func(e *colly.HTMLElement) {
-		if e.Attr("class") != "topic-list" {
+		if e.Attr("class") != "topic-list partial" {
 			return
 		}
 		log.Println("[Scraper:eksi] Getting topics from eksisozluk#haber")
