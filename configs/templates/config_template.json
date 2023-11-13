@@ -11,5 +11,7 @@
   "RedditConfigPath" : "configs/redditbot.agent",
   "RSSListPath" : "configs/rss_list.json",
   "RedditListPath" : "configs/reddit_list.json",
-  "TwitterListPath" : "configs/twitter_list.json"
+  "TwitterListPath" : "configs/twitter_list.json",
+  "TwitterUsername" : "username",
+  "TwitterPassword" : "password"
 }

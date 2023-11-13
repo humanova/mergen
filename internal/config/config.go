@@ -9,7 +9,7 @@ var (
 	Config Configuration
 )
 
-func init () {
+func init() {
 	err := GetConfig("./configs/config.json", &Config)
 	if err != nil {
 		log.Panicf("couldn't get/parse the config : %v", err)
@@ -17,7 +17,7 @@ func init () {
 }
 
 type Configuration struct {
-	ScrapeInterval   uint64    // minutes
+	ScrapeInterval   uint64 // minutes
 	DbName           string
 	DbHost           string
 	DbPort           int
@@ -30,6 +30,8 @@ type Configuration struct {
 	RSSListPath      string
 	RedditListPath   string
 	TwitterListPath  string
+	TwitterUsername  string
+	TwitterPassword  string
 }
 
 func GetConfig(configPath string, config *Configuration) error {

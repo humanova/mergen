@@ -8,6 +8,7 @@ import (
 	"log"
 	"mergen/internal/config"
 	"mergen/internal/post"
+	"net/http"
 	"os"
 	"sync"
 )
@@ -17,10 +18,12 @@ type Accounts struct {
 }
 
 type Account struct {
-	Name  string   `json:"name"`
-	Lang  string   `json:"lang"`
+	Name string `json:"name"`
+	Lang string `json:"lang"`
 }
+
 var accountList Accounts
+var cookies []*http.Cookie
 
 func getAccountList(path string) error {
 	accFile, err := os.Open(path)
@@ -60,6 +63,20 @@ func scrapeTwitter(result chan []post.Post) {
 	var posts []post.Post
 
 	scraper := twitterscraper.New()
+
+	if cookies != nil {
+		scraper.SetCookies(cookies)
+	} else {
+		err := scraper.Login(config.Config.TwitterUsername, config.Config.TwitterPassword)
+		if err != nil {
+			log.Printf("[Scraper:twitter] Couldn't login to Twitter account %s\n", config.Config.TwitterUsername)
+			result <- nil
+		}
+		if scraper.IsLoggedIn() {
+			cookies = scraper.GetCookies()
+		}
+	}
+
 	log.Printf("[Scraper:twitter] Getting new tweets from %d twitter accounts\n", len(accountList.Accounts))
 
 	wg := sync.WaitGroup{}
@@ -67,7 +84,7 @@ func scrapeTwitter(result chan []post.Post) {
 		for tweet := range scraper.GetTweets(context.Background(), acc.Name, 50) {
 			wg.Add(1)
 
-			go func(tweet *twitterscraper.Result, posts *[]post.Post) {
+			go func(tweet *twitterscraper.TweetResult, posts *[]post.Post) {
 				if tweet.Error != nil {
 					log.Println("[Scraper:twitter] Couldn't scrape a tweet, skipping : ", tweet.Error)
 				}

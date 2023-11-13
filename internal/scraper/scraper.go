@@ -18,10 +18,10 @@ func ScrapeAll() {
 	go scrapeTwitter(twitterChan)
 	go scrapeReddit(redditChan)
 
-	newsPosts := <- newsChan
-	eksiPosts := <- eksiChan
-	twitterPosts := <- twitterChan
-	redditPosts := <- redditChan
+	newsPosts := <-newsChan
+	eksiPosts := <-eksiChan
+	twitterPosts := <-twitterChan
+	redditPosts := <-redditChan
 
 	for _, postCollection := range [][]post.Post{newsPosts, eksiPosts, twitterPosts, redditPosts} {
 		posts = append(posts, postCollection...)
@@ -29,7 +29,7 @@ func ScrapeAll() {
 
 	// insert posts in batches of 250
 	batch := 250
-	for i:=0; i < len(posts); i+= batch {
+	for i := 0; i < len(posts); i += batch {
 		j := i + batch
 		if j > len(posts) {
 			j = len(posts)
@@ -46,6 +46,6 @@ func ScrapeAll() {
 	}
 
 	log.Printf("[Scraper:main] Published %d posts to redis channel\n", publishedCount)
-	log.Printf("[Scraper:main] Scraped %d from rss feeds, %d from eksisozluk, %d from twitter, " +
-	"%d from reddit\n------\n", len(newsPosts), len(eksiPosts), len(twitterPosts), len(redditPosts))
+	log.Printf("[Scraper:main] Scraped %d from rss feeds, %d from eksisozluk, %d from twitter, "+
+		"%d from reddit\n------\n", len(newsPosts), len(eksiPosts), len(twitterPosts), len(redditPosts))
 }

@@ -10,12 +10,12 @@ import (
 )
 
 func scrapeEksiEntries(result chan []post.Post) {
-	const baseUrl = "https://eksisozluk.com"
+	const baseUrl = "https://eksisozluk1923.com"
 	const timeLayout = "02.01.2006 15:04"
 	const source = "Eksisozluk"
 	var posts []post.Post
 	c := colly.NewCollector(
-		colly.AllowedDomains("eksisozluk.com"),
+		colly.AllowedDomains("eksisozluk1923.com"),
 	)
 
 	// parse popular topics
